@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Munetios Notebook - Create your own book</title>
+    <title>Munetios Notebook - Create your own journal</title>
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
@@ -12,20 +12,18 @@
 <!-- Poppins -->
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <!-- Boost SEO -->
-<meta name="description" content="Create your own book with Munetios Notebook. Organize your notes, ideas, and projects in one place. Start writing today!">
-<meta name="keywords" content="Munetios Notebook, notebook, book creation, note-taking, writing, organization, projects">
+<meta name="description" content="Create your own journal with Munetios Notebook. Organize your notes, ideas, and projects in one place. Start writing today!">
+<meta name="keywords" content="Munetios Notebook, notebook, journal creation, note-taking, writing, organization, projects">
 <meta name="author" content="Munetios">
-<meta property="og:title" content="Munetios Notebook - Create your own book">
-<meta property="og:description" content="Create your own book with Munetios Notebook. Organize your notes, ideas, and projects in one place. Start writing today!">
+<meta property="og:title" content="Munetios Notebook - Create your own journal">
+<meta property="og:description" content="Create your own journal with Munetios Notebook. Organize your notes, ideas, and projects in one place. Start writing today!">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://notebook.munetios.com/">
 <meta property="og:image" content="https://notebook.munetios.com/android-chrome-192x192.png">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Munetios Notebook - Create your own book">
-<meta name="twitter:description" content="Create your own book with Munetios Notebook. Organize your notes, ideas, and projects in one place. Start writing today!">
+<meta name="twitter:title" content="Munetios Notebook - Create your own journal">
+<meta name="twitter:description" content="Create your own journal with Munetios Notebook. Organize your notes, ideas, and projects in one place. Start writing today!">
 <meta name="twitter:image" content="https://notebook.munetios.com/android-chrome-192x192.png">
-     <!-- prevent iframe embed. only allow on munetios.com domain -->
-    <meta http-equiv="X-Frame-Options" content="SAMEORIGIN">
 <!-- End Boost SEO -->
  <style>
     * {
@@ -268,7 +266,7 @@
         position: absolute;
         top: 40px;
         right: 0;
-        background: rgba(22, 0, 58, 0.95);
+        background: rgba(22, 0, 58, 0.37);
         border-radius: 12px;
         box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
         backdrop-filter: blur(5px);
@@ -290,12 +288,17 @@
         border-radius: 12px;
         overflow: hidden;
         backdrop-filter: blur(5px);
-        background: rgba(22, 0, 58, 0.95);
+        background: rgba(22, 0, 58, 0.164);
         padding: 12px 16px;
 
     }
     @media (max-width: 900px) {
         .logo-text {
+            display: none;
+        }
+    }
+    @media (max-width: 700px) {
+        .last-modified {
             display: none;
         }
     }
@@ -501,9 +504,18 @@
             </svg>
         </div>
         <div id="notebookName"></div>
+        <div class="last-modified" id="lastmodified"></div>
     </div>
         <div class="top-right">
             <!-- Do Undo, redo, bg color, resize notebook, share button with text, more icon -->
+             <div class="findinpage-icon" id="findinpage">
+    <!-- Standard Find in Page Icon -->
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <circle cx="11" cy="11" r="7"/>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+    </svg>
+
+             </div>
 <div class="undo-icon" id="undoBtn" title="Undo">
     <!-- Standard Undo Icon -->
     <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -553,7 +565,7 @@
                         <circle cx="12" cy="17.5" r="1"/>
                     </svg>
                 </div>
-                <div class="more-wrapper">
+                <div class="more-wrapper liquid-glass">
                     <div class="options">
                         <div class="option" id="downloadastxt">Download as TXT</div>
                         <div class="option" id="downloadashtml">Download as HTML</div>
@@ -593,6 +605,220 @@
             </button>
             </div>
             <script>
+                document.getElementById('findinpage').addEventListener('click', function () {
+                    // Remove any existing find bar
+                    let oldBar = document.getElementById('findInPageBar');
+                    if (oldBar) {
+                        oldBar.remove();
+                        removeFindHighlights();
+                        return;
+                    }
+                    // Create floating search bar
+                    const bar = document.createElement('div');
+                    bar.id = 'findInPageBar';
+                    bar.className = 'liquid-glass';
+                    bar.style.position = 'fixed';
+                    bar.style.top = '90px';
+                    bar.style.right = '32px';
+                    bar.style.zIndex = 3000;
+                    bar.style.display = 'flex';
+                    bar.style.alignItems = 'center';
+                    bar.style.gap = '8px';
+                    bar.style.padding = '10px 18px';
+                    bar.style.borderRadius = '32px';
+                    bar.style.boxShadow = '0 4px 30px rgba(0,0,0,0.18)';
+                    bar.innerHTML = `
+                        <input type="text" id="findInPageInput" placeholder="Find in page..." style="background:rgba(255,255,255,0.18);border:none;color:#fff;padding:8px 14px;border-radius:18px;font-size:16px;outline:none;width:180px;">
+                        <span id="findInPageCount" style="font-size:14px;color:#e0d6f7;"></span>
+                        <button id="findInPagePrev" class="btn" style="padding:4px 10px;font-size:13px;">&#8593;</button>
+                        <button id="findInPageNext" class="btn" style="padding:4px 10px;font-size:13px;">&#8595;</button>
+                        <button id="findInPageClose" class="btn" style="padding:4px 10px;font-size:13px;">&times;</button>
+                    `;
+                    document.body.appendChild(bar);
+
+                    let matches = [];
+                    let currentIdx = 0;
+
+                    function highlightMatches(query) {
+                        removeFindHighlights();
+                        matches = [];
+                        if (!query) {
+                            updateCount();
+                            return;
+                        }
+                        // Search all .page-content in editor
+                        document.querySelectorAll('.editor-page .page-content').forEach((div, pageIdx) => {
+                            let html = div.innerHTML;
+                            // Remove previous highlights
+                            html = html.replace(/<span class="find-highlight[^"]*">(.*?)<\/span>/g, '$1');
+                            // Find matches (case-insensitive)
+                            let regex = new RegExp(escapeRegExp(query), 'gi');
+                            let idx = 0;
+                            html = html.replace(regex, function (match) {
+                                matches.push({ pageIdx, matchIdx: idx++ });
+                                return `<span class="find-highlight">${match}</span>`;
+                            });
+                            div.innerHTML = html;
+                        });
+                        updateCount();
+                        scrollToCurrent();
+                    }
+
+                    function updateCount() {
+                        const count = matches.length;
+                        const countSpan = document.getElementById('findInPageCount');
+                        if (count === 0) {
+                            countSpan.textContent = '';
+                        } else {
+                            countSpan.textContent = `${currentIdx + 1} of ${count}`;
+                        }
+                    }
+
+                    function scrollToCurrent() {
+                        // Remove previous active
+                        document.querySelectorAll('.find-highlight-active').forEach(el => el.classList.remove('find-highlight-active'));
+                        if (matches.length === 0) return;
+                        // Find all highlights
+                        let allHighlights = Array.from(document.querySelectorAll('.find-highlight'));
+                        let el = allHighlights[currentIdx];
+                        if (el) {
+                            el.classList.add('find-highlight-active');
+                            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        }
+                        updateCount();
+                    }
+
+                    function removeFindHighlights() {
+                        document.querySelectorAll('.editor-page .page-content').forEach(div => {
+                            div.innerHTML = div.innerHTML.replace(/<span class="find-highlight[^"]*">(.*?)<\/span>/g, '$1');
+                        });
+                    }
+
+                    function escapeRegExp(str) {
+                        return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                    }
+
+                    // Style for highlight
+                    const style = document.createElement('style');
+                    style.textContent = `
+                        .find-highlight {
+                            background: #ffe066;
+                            color: #222;
+                            border-radius: 4px;
+                            padding: 0 2px;
+                        }
+                        .find-highlight-active {
+                            background: #ffd700;
+                            color: #222;
+                            outline: 2px solid #4109c2;
+                        }
+                    `;
+                    document.head.appendChild(style);
+
+                    // Input events
+                    const input = document.getElementById('findInPageInput');
+                    input.focus();
+                    input.addEventListener('input', function () {
+                        currentIdx = 0;
+                        highlightMatches(this.value.trim());
+                    });
+
+                    // Next/Prev buttons
+                    document.getElementById('findInPageNext').addEventListener('click', function () {
+                        if (matches.length === 0) return;
+                        currentIdx = (currentIdx + 1) % matches.length;
+                        scrollToCurrent();
+                    });
+                    document.getElementById('findInPagePrev').addEventListener('click', function () {
+                        if (matches.length === 0) return;
+                        currentIdx = (currentIdx - 1 + matches.length) % matches.length;
+                        scrollToCurrent();
+                    });
+
+                    // Close button
+                    document.getElementById('findInPageClose').addEventListener('click', function () {
+                        bar.remove();
+                        removeFindHighlights();
+                        style.remove();
+                    });
+
+                    // ESC closes
+                    input.addEventListener('keydown', function (e) {
+                        if (e.key === 'Escape') {
+                            bar.remove();
+                            removeFindHighlights();
+                            style.remove();
+                        }
+                        if (e.key === 'Enter' && matches.length > 0) {
+                            currentIdx = (currentIdx + 1) % matches.length;
+                            scrollToCurrent();
+                        }
+                    });
+
+                    // Remove highlights on navigation away from editor
+                    window.addEventListener('hashchange', function () {
+                        bar.remove();
+                        removeFindHighlights();
+                        style.remove();
+                    });
+
+                    // Initial highlight if any
+                    highlightMatches('');
+                });
+                function formatDateTime12h(ts) {
+                    if (!ts) return '';
+                    const d = new Date(ts);
+                    let hours = d.getHours();
+                    const minutes = d.getMinutes().toString().padStart(2, '0');
+                    const ampm = hours >= 12 ? 'PM' : 'AM';
+                    hours = hours % 12;
+                    if (hours === 0) hours = 12;
+                    const month = (d.getMonth() + 1).toString().padStart(2, '0');
+                    const day = d.getDate().toString().padStart(2, '0');
+                    const year = d.getFullYear();
+                    return `${month}/${day}/${year} ${hours}:${minutes} ${ampm}`;
+                }
+
+                // Render last modified date in editor topbar
+                function renderLastModified() {
+                    const lastModDiv = document.getElementById('lastmodified');
+                    if (!lastModDiv || !currentNotebookId) {
+                        if (lastModDiv) lastModDiv.textContent = '';
+                        return;
+                    }
+                    getNotebooksFromDB().then(notebooks => {
+                        const notebook = notebooks.find(nb => nb.id === currentNotebookId);
+                        if (!notebook || !notebook.updatedAt) {
+                            lastModDiv.textContent = '';
+                            return;
+                        }
+                        lastModDiv.textContent = 'Last Modified: ' + formatDateTime12h(notebook.updatedAt);
+                    });
+                }
+
+                // Patch renderEditorPages and saveEditorPages to update last modified
+                const origRenderEditorPagesForLastMod = renderEditorPages;
+                renderEditorPages = function() {
+                    origRenderEditorPagesForLastMod();
+                    renderLastModified();
+                };
+                const origSaveEditorPagesForLastMod = saveEditorPages;
+                saveEditorPages = function() {
+                    origSaveEditorPagesForLastMod();
+                    renderLastModified();
+                };
+
+                // Also update on notebook load
+                window.addEventListener('hashchange', function() {
+                    if (window.location.hash.startsWith('#/editor/')) {
+                        setTimeout(renderLastModified, 0);
+                    }
+                });
+                window.addEventListener('DOMContentLoaded', function() {
+                    if (window.location.hash.startsWith('#/editor/')) {
+                        setTimeout(renderLastModified, 0);
+                    }
+                });
                     const moreBtn = document.getElementById('moreBtn');
                     const moreWrapper = document.querySelector('.more-wrapper');
 
@@ -1164,9 +1390,22 @@
                 <button type="button" title="Bulleted List" onclick="formatEditorPage('insertUnorderedList', null, ${idx})" style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer;">&#8226;•&#8226;</button>
                 <button type="button" title="Numbered List" onclick="formatEditorPage('insertOrderedList', null, ${idx})" style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer;">1.</button>
                 <input type="color" title="Text Color" style="width:28px;height:28px;border:none;background:none;cursor:pointer;" onchange="formatEditorPage('foreColor', this.value, ${idx})">
-                <button type="button" title="Insert Image" onclick="document.getElementById('imageInput${idx}').click()" style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer;">🖼️</button>
+                <button type="button" title="Insert Image" onclick="document.getElementById('imageInput'+${idx}).click()" style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer;">
+                    <!-- Image SVG icon -->
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="3" y="3" width="18" height="18" rx="2" />
+                        <circle cx="8.5" cy="8.5" r="1.5"/>
+                        <path d="M21 15l-5-5L5 21"/>
+                    </svg>
+                </button>
                 <input type="file" id="imageInput${idx}" accept="image/*" style="display:none" onchange="insertImageFilePage(this, ${idx})">
-                <button type="button" title="Insert Video" onclick="document.getElementById('videoInput${idx}').click()" style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer;">🎬</button>
+                <button type="button" title="Insert Video" onclick="document.getElementById('videoInput'+${idx}).click()" style="background:none;border:none;color:#fff;font-size:20px;cursor:pointer;">
+                    <!-- Standard Video SVG icon (rectangle with play triangle) -->
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2" y="4" width="20" height="16" rx="2" />
+                        <polygon points="10 8 16 12 10 16 10 8" fill="currentColor"/>
+                    </svg>
+                </button>
                 <input type="file" id="videoInput${idx}" accept="video/*" style="display:none" onchange="insertVideoFilePage(this, ${idx})">
                 </div>
             `;
@@ -2189,12 +2428,19 @@
             </div>
             <div style="margin-bottom:18px;">
             <select id="notebookTags" multiple style="width:100%;min-height:38px;">
-                ${tagOptions}
+            ${tagOptions}
             </select>
             <div style="font-size:12px;color:#e0d6f7;margin-top:4px;">Hold Ctrl (Cmd on Mac) to select multiple tags</div>
             </div>
             <button type="submit" class="btn" style="width:100%;justify-content:center;">
             <span>Create Notebook</span>
+            </button>
+            <button type="button" class="btn" id="importNotebookBtn" style="width:100%;justify-content:center;margin-top:10px;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 3v12m0 0l-4-4m4 4l4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            <rect x="4" y="17" width="16" height="4" rx="2" stroke="currentColor" stroke-width="2"/>
+            </svg>
+            <div class="create-label">Import Notebook</div>
             </button>
             </form>
             `);
@@ -2216,6 +2462,132 @@
             document.getElementById('modal').remove();
             renderNotebooks();
             window.location.hash = `#/editor/${id}`;
+            });
+
+            // Import notebook (txt, html, md) inside create modal
+            document.getElementById('importNotebookBtn').addEventListener('click', function() {
+            // Show import UI inside modal
+            const modalContent = document.querySelector('#modal .modal-content');
+            if (!modalContent) return;
+            // Remove any previous import UI
+            const oldImport = document.getElementById('importNotebookFileRow');
+            if (oldImport) oldImport.remove();
+            // Insert import UI before the form buttons
+            const importDiv = document.createElement('div');
+            importDiv.id = 'importNotebookFileRow';
+            importDiv.innerHTML = `
+                <div style="margin-bottom:12px;">
+                <input type="file" id="importNotebookFile" accept=".txt,.md,.markdown,.html,text/plain,text/html,text/markdown" style="width:100%;" />
+                </div>
+                <div style="font-size:13px;color:#e0d6f7;margin-bottom:12px;">
+                Supported: Plain Text (.txt), HTML (.html), Markdown (.md)
+                </div>
+                <button class="btn" id="importNotebookGoBtn" style="width:100%;justify-content:center;" disabled>Import</button>
+            `;
+            // Insert after the form fields but before the buttons
+            const form = document.getElementById('newNotebookForm');
+            form.insertBefore(importDiv, form.querySelector('button[type="submit"]'));
+
+            const fileInput = document.getElementById('importNotebookFile');
+            const importBtn = document.getElementById('importNotebookGoBtn');
+            fileInput.addEventListener('change', function() {
+                importBtn.disabled = !fileInput.files || !fileInput.files[0];
+            });
+            importBtn.addEventListener('click', async function() {
+                if (!fileInput.files || !fileInput.files[0]) return;
+                const file = fileInput.files[0];
+                const ext = file.name.split('.').pop().toLowerCase();
+                const reader = new FileReader();
+                reader.onload = async function(e) {
+                let content = e.target.result;
+                let title = file.name.replace(/\.[^/.]+$/, '');
+                let pages = [];
+                if (ext === 'txt') {
+                    // Each line break as new paragraph, all in one page
+                    pages = [{
+                    title: title,
+                    content: '<pre style="white-space:pre-wrap;font-family:inherit;">' + escapeHtml(content) + '</pre>'
+                    }];
+                } else if (ext === 'html' || file.type === 'text/html') {
+                    // Try to extract <title> and <body>
+                    let doc = document.createElement('html');
+                    doc.innerHTML = content;
+                    let pageTitle = doc.querySelector('title') ? doc.querySelector('title').textContent : title;
+                    let body = doc.querySelector('body') ? doc.querySelector('body').innerHTML : content;
+                    pages = [{
+                    title: pageTitle,
+                    content: body
+                    }];
+                } else if (ext === 'md' || ext === 'markdown' || file.type === 'text/markdown') {
+                    // Basic Markdown to HTML conversion (headings, bold, italic, lists, code, links)
+                    let lines = content.split(/\r?\n/);
+                    let currentPage = { title: title, content: '' };
+                    let html = '';
+                    let inList = false, inOl = false, inCode = false;
+                    for (let i = 0; i < lines.length; ++i) {
+                    let line = lines[i];
+                    if (/^#{1,6}\s/.test(line)) {
+                        let level = line.match(/^#+/)[0].length;
+                        let text = line.replace(/^#{1,6}\s/, '');
+                        if (html) html += '</div>';
+                        html += `<h${level}>${escapeHtml(text)}</h${level}><div>`;
+                    } else if (/^[-*+]\s+/.test(line)) {
+                        if (!inList) { html += '<ul>'; inList = true; }
+                        html += `<li>${escapeHtml(line.replace(/^[-*+]\s+/, ''))}</li>`;
+                    } else if (/^\d+\.\s+/.test(line)) {
+                        if (!inOl) { html += '<ol>'; inOl = true; }
+                        html += `<li>${escapeHtml(line.replace(/^\d+\.\s+/, ''))}</li>`;
+                    } else if (/^```/.test(line)) {
+                        if (!inCode) { html += '<pre><code>'; inCode = true; }
+                        else { html += '</code></pre>'; inCode = false; }
+                    } else if (inCode) {
+                        html += escapeHtml(line) + '\n';
+                    } else if (line.trim() === '') {
+                        if (inList) { html += '</ul>'; inList = false; }
+                        if (inOl) { html += '</ol>'; inOl = false; }
+                        html += '<br>';
+                    } else {
+                        // Inline formatting: bold, italic, links
+                        let l = escapeHtml(line)
+                        .replace(/\*\*(.+?)\*\*/g, '<b>$1</b>')
+                        .replace(/\*(.+?)\*/g, '<i>$1</i>')
+                        .replace(/__(.+?)__/g, '<u>$1</u>')
+                        .replace(/~~(.+?)~~/g, '<s>$1</s>')
+                        .replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" target="_blank">$1</a>');
+                        html += l + '<br>';
+                    }
+                    }
+                    if (inList) html += '</ul>';
+                    if (inOl) html += '</ol>';
+                    if (inCode) html += '</code></pre>';
+                    if (html) html = `<div>${html}</div>`;
+                    currentPage.content = html;
+                    pages = [currentPage];
+                } else {
+                    // Fallback: treat as plain text
+                    pages = [{
+                    title: title,
+                    content: '<pre style="white-space:pre-wrap;font-family:inherit;">' + escapeHtml(content) + '</pre>'
+                    }];
+                }
+                // Save notebook
+                const id = 'nb_' + Date.now();
+                const notebook = {
+                    id,
+                    title: pages[0].title || title,
+                    desc: '',
+                    tags: [],
+                    pages: pages,
+                    content: pages[0].content || ''
+                };
+                await saveNotebookToDB(notebook);
+                document.getElementById('modal').remove();
+                renderNotebooks();
+                window.location.hash = `#/editor/${id}`;
+                showToast('Notebook imported.');
+                };
+                reader.readAsText(file);
+            });
             });
         });
 
@@ -2240,7 +2612,7 @@
 
             // Close modal on background click
             modal.addEventListener('click', function(e) {
-                if (e.target === modal) modal.remove();
+            if (e.target === modal) modal.remove();
             });
         }
 
@@ -2248,6 +2620,4 @@
         
     </script>
 </body>
-
 </html> 
-
